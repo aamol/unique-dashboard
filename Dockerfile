@@ -10,7 +10,6 @@ WORKDIR /src
 RUN npm install
 
 COPY flow /src/flow
-COPY webcontent /src/webcontent
 
 EXPOSE 81
 CMD [ "npm","start" ]
