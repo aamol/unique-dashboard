@@ -1,0 +1,216 @@
+[
+    {
+        "id": "54987b3c.aed2e4",
+        "type": "tab",
+        "label": "Flow 2"
+    },
+    {
+        "id": "c85a7573.c3db18",
+        "type": "tab",
+        "label": "Flow 3"
+    },
+    {
+        "id": "2544bdcc.b9a8c2",
+        "type": "mongodb",
+        "z": "",
+        "hostname": "blrsku19856069",
+        "port": "27017",
+        "db": "test1",
+        "name": "Mongo"
+    },
+    {
+        "id": "e3701a9.76ed4e8",
+        "type": "mongodb in",
+        "z": "54987b3c.aed2e4",
+        "mongodb": "2544bdcc.b9a8c2",
+        "name": "",
+        "collection": "graph1",
+        "operation": "aggregate",
+        "x": 461.5,
+        "y": 57,
+        "wires": [
+            [
+                "8ad61e1.8c9b9e"
+            ]
+        ]
+    },
+    {
+        "id": "37db82d3.0b5eae",
+        "type": "http response",
+        "z": "54987b3c.aed2e4",
+        "name": "",
+        "x": 760.5,
+        "y": 52,
+        "wires": []
+    },
+    {
+        "id": "4f610249.1c6b9c",
+        "type": "http in",
+        "z": "54987b3c.aed2e4",
+        "name": "",
+        "url": "/main",
+        "method": "get",
+        "swaggerDoc": "",
+        "x": 80.5,
+        "y": 61,
+        "wires": [
+            [
+                "5cc1857a.96c57c"
+            ]
+        ]
+    },
+    {
+        "id": "5cc1857a.96c57c",
+        "type": "function",
+        "z": "54987b3c.aed2e4",
+        "name": "Query Param",
+        "func": "msg.limit=0;\nmsg.skip=0;\nvar pageName=msg.req.query.param;\nmsg.payload={ \"pageName.$\": 1 }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 197.5,
+        "y": 149,
+        "wires": [
+            [
+                "e3701a9.76ed4e8"
+            ]
+        ]
+    },
+    {
+        "id": "8ad61e1.8c9b9e",
+        "type": "function",
+        "z": "54987b3c.aed2e4",
+        "name": "Query Param",
+        "func": "var asd = msg.payload;\nvar array=[];\nfor(i=0;i<asd.length;i++){\n    if(array.indexOf(asd[i].pageName) == -1){\n    array.push(asd[i].pageName);\n    }\n}\nmsg.payload=array;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 446,
+        "y": 232,
+        "wires": [
+            [
+                "864489d7.b9cae8"
+            ]
+        ]
+    },
+    {
+        "id": "864489d7.b9cae8",
+        "type": "template",
+        "z": "54987b3c.aed2e4",
+        "name": "Main Page",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css\">\n<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js\"></script>\n<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js\"></script>\n<meta charset=\"utf-8\">\n<style type=\"text/css\">\n    svg {\n        font-family: \"Helvetica Neue\", Helvetica;\n    }\n\n    .line {\n        fill: none;\n        stroke: #000;\n        stroke-width: 2px;\n    }\n</style>\n\n<body>\n\n\n   \n  <div>\n        <ul class=\"nav nav-tabs\">\n\t\t\t{{#payload}}\n\t\t\t{{#.}}\n            <li><a href=\"/graph?param={{.}}\" target=\"graph_iframe\" data-toggle=\"tooltip\" title=\"Menu 1\">{{.}}</a></li>\n\t\t\t{{/.}}\n\t\t\t{{/payload}}\n        </ul>\n    </div>\n\n    <iframe src=\"graph?param=Home Page\" width=\"100%\" height=\"650px\" name=\"graph_iframe\"></iframe>\n\n</body>\n",
+        "x": 698.5,
+        "y": 452,
+        "wires": [
+            [
+                "37db82d3.0b5eae"
+            ]
+        ]
+    },
+    {
+        "id": "cb216dd8.ba811",
+        "type": "function",
+        "z": "c85a7573.c3db18",
+        "name": "",
+        "func": "var final=[];\n\nfor(i=0;i<msg.payload.length;i++){\nvar data={};\nvar date=new Date(msg.payload[i].date).getTime();\ndata[\"loadEvent\"]=msg.payload[i].loadEvent;\ndata[\"domComplete\"]=msg.payload[i].domComplete;\ndata[\"domInteractive\"]=msg.payload[i].domInteractive;\ndata[\"date\"]=date;\nfinal.push(data);\n}\nmsg.payload=final;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 605.5,
+        "y": 469,
+        "wires": [
+            [
+                "f31b0749.9619f8"
+            ]
+        ]
+    },
+    {
+        "id": "d5cd2067.d555a",
+        "type": "http in",
+        "z": "c85a7573.c3db18",
+        "name": "Graph",
+        "url": "/graph",
+        "method": "get",
+        "swaggerDoc": "",
+        "x": 121.5,
+        "y": 129,
+        "wires": [
+            [
+                "eae4396c.c53408"
+            ]
+        ]
+    },
+    {
+        "id": "b0fd1468.1fe4c8",
+        "type": "template",
+        "z": "c85a7573.c3db18",
+        "name": "Html",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html lang=\"en\">\n\n<head>\n\n\n    <link href=\"http://getbootstrap.com/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n\n    <link href=\"http://getbootstrap.com/examples/justified-nav/justified-nav.css\" rel=\"stylesheet\">\n\n    <style>\n        .axis path {\n            fill: none;\n            stroke: #777;\n            shape-rendering: crispEdges;\n        }\n        .axis text {\n            font-family: Lato;\n            font-size: 13px;\n        }\n    </style>\n\n</head>\n\n<body>\n\n    <div class=\"container\">\n\n        <div class=\"jumbotron\">\n\n            <svg id=\"visualisation\" width=\"1000\" height=\"500\"></svg>\n            <script src=\"http://d3js.org/d3.v3.min.js\" charset=\"utf-8\"></script>\n            <script>\n                function InitChart() {\n                    //console.log()\n                    \n\t\t\t\t\tvar newData = {{{payload}}};\n\t\t\t\t\t\n                    var data = [{\n                        \"sale\": \"202\",\n                        \"year\": \"2000\"\n                    }, {\n                        \"sale\": \"215\",\n                        \"year\": \"2002\"\n                    }, {\n                        \"sale\": \"179\",\n                        \"year\": \"2004\"\n                    }, {\n                        \"sale\": \"199\",\n                        \"year\": \"2006\"\n                    }, {\n                        \"sale\": \"134\",\n                        \"year\": \"2008\"\n                    }, {\n                        \"sale\": \"176\",\n                        \"year\": \"2010\"\n                    }];\n                    var data2 = [{\n                        \"sale\": \"152\",\n                        \"year\": \"2000\"\n                    }, {\n                        \"sale\": \"189\",\n                        \"year\": \"2002\"\n                    }, {\n                        \"sale\": \"179\",\n                        \"year\": \"2004\"\n                    }, {\n                        \"sale\": \"199\",\n                        \"year\": \"2006\"\n                    }, {\n                        \"sale\": \"134\",\n                        \"year\": \"2008\"\n                    }, {\n                        \"sale\": \"176\",\n                        \"year\": \"2010\"\n                    }];\n                    var vis = d3.select(\"#visualisation\"),\n                        WIDTH = 1000,\n                        HEIGHT = 500,\n                        MARGINS = {\n                            top: 20,\n                            right: 20,\n                            bottom: 20,\n                            left: 50\n                        },\n                        xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([1490402261860, 1490404639369]),\n\t\t\t\t\t\t//xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(newData, function(d) {return d.date;}), d3.max(newData, function(d) {return d.date;})]) ,\n                        yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([300, 6000]),\n\t\t\t\t\t\t//yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(newData, function(d) {return d.domInteractive;}), d3.max(newData, function(d) {return d.loadEvent;})]) ,\n                        xAxis = d3.svg.axis()\n                        .scale(xScale),\n                        yAxis = d3.svg.axis()\n                        .scale(yScale)\n                        .orient(\"left\");\n                    \n                    vis.append(\"svg:g\")\n                        .attr(\"class\", \"x axis\")\n                        .attr(\"transform\", \"translate(0,\" + (HEIGHT - MARGINS.bottom) + \")\")\n                        .call(xAxis);\n                    vis.append(\"svg:g\")\n                        .attr(\"class\", \"y axis\")\n                        .attr(\"transform\", \"translate(\" + (MARGINS.left) + \",0)\")\n                        .call(yAxis);\n                    var lineGen = d3.svg.line()\n                        .x(function(d) {\n                            return xScale(d.date);\n                        })\n                        .y(function(d) {\n                            return yScale(d.loadEvent);\n                        })\n                        .interpolate(\"basis\");\n\t\t\t\t\tvar lineGen1 = d3.svg.line()\n                        .x(function(d) {\n                            return xScale(d.date);\n                        })\n                        .y(function(d) {\n                            return yScale(d.domComplete);\n                        })\n                        .interpolate(\"basis\");\n\t\t\t\t\tvar lineGen2 = d3.svg.line()\n                        .x(function(d) {\n                            return xScale(d.date);\n                        })\n                        .y(function(d) {\n                            return yScale(d.domInteractive);\n                        })\n                        .interpolate(\"basis\");\n\t\t\t\t\tconsole.log(lineGen(newData));\n                    vis.append('svg:path')\n                        .attr('d', lineGen(newData))\n                        .attr('stroke', 'green')\n                        .attr('stroke-width', 2)\n                        .attr('fill', 'none');\n\t\t\t\t\tvis.append('svg:path')\n                        .attr('d', lineGen1(newData))\n                        .attr('stroke', 'blue')\n                        .attr('stroke-width', 2)\n                        .attr('fill', 'none');\n\t\t\t\t\tvis.append('svg:path')\n                        .attr('d', lineGen2(newData))\n                        .attr('stroke', 'red')\n                        .attr('stroke-width', 2)\n                        .attr('fill', 'none');\n                   \n                }\n                InitChart();\n            </script>\n        </div>\n\n    </div>\n\n</body>\n\n</html>",
+        "x": 402.5,
+        "y": 159,
+        "wires": [
+            [
+                "d6a4524c.30388"
+            ]
+        ]
+    },
+    {
+        "id": "d6a4524c.30388",
+        "type": "http response",
+        "z": "c85a7573.c3db18",
+        "name": "",
+        "x": 669.5,
+        "y": 105,
+        "wires": []
+    },
+    {
+        "id": "eae4396c.c53408",
+        "type": "function",
+        "z": "c85a7573.c3db18",
+        "name": "Query Param",
+        "func": "msg.limit=0;\nmsg.skip=0;\nvar pageName=msg.req.query.param;\nmsg.payload={ \"pageName\": pageName }\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 118,
+        "y": 354,
+        "wires": [
+            [
+                "2a7f895f.fb5cb6"
+            ]
+        ]
+    },
+    {
+        "id": "2a7f895f.fb5cb6",
+        "type": "mongodb in",
+        "z": "c85a7573.c3db18",
+        "mongodb": "2544bdcc.b9a8c2",
+        "name": "",
+        "collection": "graph1",
+        "operation": "find",
+        "x": 229,
+        "y": 469,
+        "wires": [
+            [
+                "cb216dd8.ba811"
+            ]
+        ]
+    },
+    {
+        "id": "f31b0749.9619f8",
+        "type": "json",
+        "z": "c85a7573.c3db18",
+        "name": "",
+        "x": 440.5,
+        "y": 338,
+        "wires": [
+            [
+                "b0fd1468.1fe4c8"
+            ]
+        ]
+    }
+]
